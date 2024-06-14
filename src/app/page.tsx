@@ -1,7 +1,15 @@
 export default async function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <p className="text-2xl text-white">Echoes</p>
+    <main className="grid min-h-screen w-full grid-cols-2">
+      <div className="bg-dark border-border h-full w-full border-r border-dashed p-4">
+        <h1 className="text-2xl font-bold">Heading</h1>
+        <p className="text-muted-foreground">I am faded</p>
+      </div>
+      <div className="h-ull bg-background w-full">
+        <p className="text-warning">I am warning</p>
+        <p className="text-success">I am success</p>
+        <p className="text-error">I am error</p>
+      </div>
     </main>
   );
 }
