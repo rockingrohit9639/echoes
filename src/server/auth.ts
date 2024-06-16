@@ -64,3 +64,18 @@ export const authOptions: NextAuthOptions = {
  * @see https://next-auth.js.org/configuration/nextjs
  */
 export const getServerAuthSession = () => getServerSession(authOptions);
+
+/**
+ * This function must be used only for the authenticated routes
+ * if session is not found this function will throw an error
+ */
+export async function ensureAuthSession() {
+  const session = await getServerAuthSession();
+  if (!session) {
+    throw new Error(
+      "ensureAuthSession must be used in authenticated routes only",
+    );
+  }
+
+  return session;
+}
