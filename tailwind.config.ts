@@ -21,6 +21,7 @@ export default {
         success: colors.emerald["500"],
         error: colors.red["500"],
         muted: {
+          DEFAULT: colors.zinc["900"],
           foreground: colors.zinc["500"],
         },
       },
