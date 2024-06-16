@@ -12,7 +12,10 @@ export default {
       colors: {
         dark: colors.black,
         background: colors.zinc["950"],
-        primary: colors.white,
+        primary: {
+          DEFAULT: colors.white,
+          foreground: colors.black,
+        },
         border: colors.zinc["900"],
         warning: colors.amber["500"],
         success: colors.emerald["500"],
