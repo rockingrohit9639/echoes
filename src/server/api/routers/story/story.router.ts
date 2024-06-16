@@ -1,0 +1,11 @@
+import { createTRPCRouter, protectedProcedure } from "../../trpc";
+import { newStoryInput } from "./story.input";
+import { startNewStory } from "./story.service";
+
+export const storyRouter = createTRPCRouter({
+  new: protectedProcedure
+    .input(newStoryInput)
+    .mutation(({ input, ctx }) =>
+      startNewStory(input, ctx.db, ctx.session.user),
+    ),
+});

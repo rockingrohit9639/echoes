@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
 import { type BasicProps } from "~/types/basic";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, PlusIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import {} from "next";
+import NavLink from "./nav-link";
 
 type SidebarProps = BasicProps;
 
@@ -33,15 +35,21 @@ export default function Sidebar({ className, style }: SidebarProps) {
       )}
       style={style}
     >
-      <Link href="/">
-        <Image
-          src="/logo.png"
-          alt="logo"
-          width={40}
-          height={40}
-          className="w-8 object-contain grayscale hover:grayscale-0"
-        />
-      </Link>
+      <div>
+        <Link href="/" className="mb-8 block">
+          <Image
+            src="/logo.png"
+            alt="logo"
+            width={40}
+            height={40}
+            className="w-8 object-contain grayscale hover:grayscale-0"
+          />
+        </Link>
+
+        <NavLink href="/story/new" icon={<PlusIcon />}>
+          new story
+        </NavLink>
+      </div>
 
       <div>
         <div className="mb-4 w-full border-y border-dashed border-border py-4">

@@ -45,6 +45,7 @@ model User {
 
     accounts Account[]
     sessions Session[]
+    stories  Story[]
 }
 
 model VerificationToken {
@@ -54,4 +55,40 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Story {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    genre               String
+    base                String
+    characterName       String
+    characterAppearance String
+    isCompleted         Boolean @default(false)
+
+    messages Message[]
+
+    createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+    createdById String @db.ObjectId
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum MessageFrom {
+    ai
+    human
+}
+
+model Message {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    from    MessageFrom
+    content String
+
+    story   Story  @relation(fields: [storyId], references: [id], onDelete: Cascade)
+    storyId String @db.ObjectId
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

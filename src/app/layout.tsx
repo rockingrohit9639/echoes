@@ -6,7 +6,7 @@ import Providers from "~/components/providers";
 
 export const metadata = {
   title: "Echoes",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [{ rel: "icon", url: "/logo.png" }],
 };
 
 export default function RootLayout({
