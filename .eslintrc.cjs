@@ -35,6 +35,7 @@ const config = {
         },
       },
     ],
+    "no-console": "warn",
   },
 };
 module.exports = config;
