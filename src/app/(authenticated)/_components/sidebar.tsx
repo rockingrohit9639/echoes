@@ -17,11 +17,11 @@ export default function Sidebar({ className, style }: SidebarProps) {
   if (status === "loading") {
     return (
       <div className="flex h-full flex-col justify-between px-4 py-5">
-        <div className="bg-muted size-8 animate-pulse rounded-full" />
+        <div className="size-8 animate-pulse rounded-full bg-muted" />
 
         <div>
-          <div className="bg-muted mb-4 h-10 w-full animate-pulse" />
-          <div className="bg-muted h-10 w-full animate-pulse" />
+          <div className="mb-4 h-10 w-full animate-pulse bg-muted" />
+          <div className="h-10 w-full animate-pulse bg-muted" />
         </div>
       </div>
     );
@@ -47,7 +47,7 @@ export default function Sidebar({ className, style }: SidebarProps) {
         </Link>
 
         <NavLink href="/story/new" icon={<PlusIcon />}>
-          new story
+          new adventure
         </NavLink>
       </div>
 

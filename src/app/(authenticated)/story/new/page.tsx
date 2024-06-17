@@ -45,9 +45,30 @@ export default function NewStory() {
     },
   });
 
+  const randomStoryMutation = api.story.startRandomStory.useMutation({
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: (storyCreated) => {
+      router.replace(`/story/${storyCreated.id}`);
+      toast.success("The world awaits. Let your story unfold.");
+    },
+  });
+
   return (
-    <div className="py-6">
+    <div className="p-6">
       <h1 className="mb-8 text-2xl font-bold">Craft your next adventure</h1>
+
+      <div className="mb-4 flex items-center justify-end border-b border-dashed border-border pb-4">
+        <Button
+          loading={randomStoryMutation.isPending}
+          onClick={() => {
+            randomStoryMutation.mutate();
+          }}
+        >
+          ✨ Surprise me
+        </Button>
+      </div>
 
       <Form {...form}>
         <form

@@ -17,7 +17,7 @@ export default function AppShell({
       <div className="fixed inset-y-0 hidden w-64 border-r border-dashed border-border bg-background transition-all xl:block">
         <Sidebar />
       </div>
-      <main className="flex w-full flex-1 flex-col xl:pl-72">{children}</main>
+      <main className="flex w-full flex-1 flex-col xl:pl-64">{children}</main>
     </div>
   );
 }

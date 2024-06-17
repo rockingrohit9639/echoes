@@ -26,6 +26,15 @@ export default {
         },
       },
     },
+    keyframes: {
+      fade: {
+        from: { opacity: "0.10" },
+        to: { opacity: "1" },
+      },
+    },
+    animation: {
+      fade: "fade 1s linear infinite",
+    },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
 } satisfies Config;
