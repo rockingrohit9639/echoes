@@ -12,6 +12,7 @@ Appearance of the character - ${input.characterAppearance}
 
 You can add any extra information relevant to the story.
 Your task is to consume this information and give the starting of the story to the user so the user can continue. 
+Keep the language and vocabulary easy and more readable.
 Give the content in markdown format.
 `;
 }

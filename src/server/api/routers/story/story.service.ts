@@ -81,3 +81,18 @@ export async function startRandomStory(db: PrismaClient, user: User) {
     });
   }
 }
+
+export async function getStoryById(id: string, db: PrismaClient, user: User) {
+  const story = await db.story.findFirst({
+    where: { id, createdById: user.id },
+  });
+
+  if (!story) {
+    throw new TRPCError({
+      message: "Story not found!",
+      code: "NOT_FOUND",
+    });
+  }
+
+  return story;
+}

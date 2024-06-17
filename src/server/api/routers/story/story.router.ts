@@ -1,6 +1,7 @@
+import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { newStoryInput } from "./story.input";
-import { startNewStory, startRandomStory } from "./story.service";
+import { getStoryById, startNewStory, startRandomStory } from "./story.service";
 
 export const storyRouter = createTRPCRouter({
   new: protectedProcedure
@@ -11,4 +12,7 @@ export const storyRouter = createTRPCRouter({
   startRandomStory: protectedProcedure.mutation(({ ctx }) =>
     startRandomStory(ctx.db, ctx.session.user),
   ),
+  findById: protectedProcedure
+    .input(z.string())
+    .query(({ input, ctx }) => getStoryById(input, ctx.db, ctx.session.user)),
 });
