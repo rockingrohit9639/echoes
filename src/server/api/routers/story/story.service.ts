@@ -1,6 +1,10 @@
 import { type PrismaClient } from "@prisma/client";
 import { type User } from "next-auth";
-import { newStoryInput, type NewStoryInput } from "./story.input";
+import {
+  newStoryInput,
+  newStoryOutput,
+  type NewStoryInput,
+} from "./story.input";
 import { TRPCError } from "@trpc/server";
 import { getNewStoryPrompt } from "./story.prompt";
 import { gemini } from "~/lib/gemini";
@@ -15,11 +19,26 @@ export async function startNewStory(
   user: User,
 ) {
   try {
+    const parser = StructuredOutputParser.fromZodSchema(newStoryOutput);
+
+    const chain = RunnableSequence.from([
+      PromptTemplate.fromTemplate(
+        `${ECHO_INTRO}. \n{format_instructions}\n{question}`,
+      ),
+      gemini,
+      parser,
+    ]);
+
     const prompt = getNewStoryPrompt(input);
-    const response = await gemini.invoke(prompt);
+
+    const newStory = await chain.invoke({
+      question: prompt,
+      format_instructions: parser.getFormatInstructions(),
+    });
 
     const storyCreated = await db.story.create({
       data: {
+        title: newStory.title,
         genre: input.genre,
         base: input.storyBase,
         characterName: input.characterName,
@@ -36,7 +55,7 @@ export async function startNewStory(
               /** Second message is the response from AI */
               {
                 from: "ai",
-                content: response.content as string,
+                content: newStory.content,
               },
             ],
           },

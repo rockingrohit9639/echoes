@@ -30,3 +30,13 @@ export const newStoryInput = z.object({
 });
 
 export type NewStoryInput = z.infer<typeof newStoryInput>;
+
+export const newStoryOutput = z.object({
+  title: z
+    .string()
+    .describe("A suitable title for the story matching the vibe of the story"),
+  content: z
+    .string()
+    .max(2000)
+    .describe("Starting of the story to the user so the user can continue."),
+});

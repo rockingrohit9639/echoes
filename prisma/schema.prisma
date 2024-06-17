@@ -60,6 +60,7 @@ model VerificationToken {
 model Story {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
+    title               String
     genre               String
     base                String
     characterName       String
