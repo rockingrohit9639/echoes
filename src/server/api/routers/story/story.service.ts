@@ -115,3 +115,10 @@ export async function getStoryById(id: string, db: PrismaClient, user: User) {
 
   return story;
 }
+
+export async function getUserStories(user: User, db: PrismaClient) {
+  return db.story.findMany({
+    where: { createdById: user.id },
+    select: { id: true, title: true },
+  });
+}

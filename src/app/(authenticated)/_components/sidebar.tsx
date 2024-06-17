@@ -8,11 +8,14 @@ import { LogOutIcon, PlusIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import {} from "next";
 import NavLink from "./nav-link";
+import { api } from "~/trpc/react";
 
 type SidebarProps = BasicProps;
 
 export default function Sidebar({ className, style }: SidebarProps) {
   const { data, status } = useSession({ required: true });
+
+  const storiesQuery = api.story.findAll.useQuery();
 
   if (status === "loading") {
     return (
@@ -46,9 +49,23 @@ export default function Sidebar({ className, style }: SidebarProps) {
           />
         </Link>
 
-        <NavLink href="/story/new" icon={<PlusIcon />}>
+        <NavLink className="mb-2" href="/story/new" icon={<PlusIcon />}>
           new adventure
         </NavLink>
+
+        <div className="flex flex-col gap-2">
+          {storiesQuery.status === "success"
+            ? storiesQuery.data.map((story) => (
+                <NavLink
+                  key={story.id}
+                  href={`/story/${story.id}`}
+                  className="text-ellipsis text-sm"
+                >
+                  {story.title}
+                </NavLink>
+              ))
+            : null}
+        </div>
       </div>
 
       <div>
