@@ -79,6 +79,7 @@ model Story {
 enum MessageFrom {
     ai
     human
+    system
 }
 
 model Message {

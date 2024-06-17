@@ -25,6 +25,8 @@ import { useRouter } from "next/navigation";
 export default function NewStory() {
   const router = useRouter();
 
+  const utils = api.useUtils();
+
   const form = useForm<NewStoryInput>({
     resolver: zodResolver(newStoryInput),
     defaultValues: {
@@ -39,7 +41,8 @@ export default function NewStory() {
     onError: (error) => {
       toast.error(error.message);
     },
-    onSuccess: (storyCreated) => {
+    onSuccess: async (storyCreated) => {
+      await utils.story.findAll.invalidate();
       router.replace(`/story/${storyCreated.id}`);
       toast.success("The world awaits. Let your story unfold.");
     },
@@ -49,7 +52,8 @@ export default function NewStory() {
     onError: (error) => {
       toast.error(error.message);
     },
-    onSuccess: (storyCreated) => {
+    onSuccess: async (storyCreated) => {
+      await utils.story.findAll.invalidate();
       router.replace(`/story/${storyCreated.id}`);
       toast.success("The world awaits. Let your story unfold.");
     },

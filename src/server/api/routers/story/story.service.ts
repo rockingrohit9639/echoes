@@ -49,7 +49,7 @@ export async function startNewStory(
             data: [
               /* First instruction message to AI */
               {
-                from: "human",
+                from: "system",
                 content: prompt,
               },
               /** Second message is the response from AI */
@@ -120,5 +120,18 @@ export async function getUserStories(user: User, db: PrismaClient) {
   return db.story.findMany({
     where: { createdById: user.id },
     select: { id: true, title: true },
+  });
+}
+
+export async function getStoryMessages(
+  storyId: string,
+  db: PrismaClient,
+  user: User,
+) {
+  const story = await getStoryById(storyId, db, user);
+
+  return db.message.findMany({
+    where: { storyId: story.id },
+    orderBy: { createdAt: "desc" },
   });
 }

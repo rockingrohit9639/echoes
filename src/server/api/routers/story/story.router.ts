@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { newStoryInput } from "./story.input";
 import {
   getStoryById,
+  getStoryMessages,
   getUserStories,
   startNewStory,
   startRandomStory,
@@ -23,4 +24,9 @@ export const storyRouter = createTRPCRouter({
   findAll: protectedProcedure.query(({ ctx }) =>
     getUserStories(ctx.session.user, ctx.db),
   ),
+  findMessages: protectedProcedure
+    .input(z.string())
+    .query(({ input, ctx }) =>
+      getStoryMessages(input, ctx.db, ctx.session.user),
+    ),
 });

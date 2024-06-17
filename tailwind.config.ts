@@ -1,6 +1,8 @@
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import colors from "tailwindcss/colors";
+import animate from "tailwindcss-animate";
+import typography from "@tailwindcss/typography";
 
 export default {
   content: ["./src/**/*.tsx"],
@@ -31,10 +33,15 @@ export default {
         from: { opacity: "0.10" },
         to: { opacity: "1" },
       },
+      pulse: {
+        "0%, 100%": { opacity: "1" },
+        "50%": { opacity: ".5" },
+      },
     },
     animation: {
       fade: "fade 1s linear infinite",
+      pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
     },
   },
-  plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
+  plugins: [animate, typography],
 } satisfies Config;
