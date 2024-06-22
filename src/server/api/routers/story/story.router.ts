@@ -1,10 +1,11 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../../trpc";
-import { newStoryInput } from "./story.input";
+import { newMessageInput, newStoryInput } from "./story.input";
 import {
   getStoryById,
   getStoryMessages,
   getUserStories,
+  handleNewMessage,
   startNewStory,
   startRandomStory,
 } from "./story.service";
@@ -28,5 +29,10 @@ export const storyRouter = createTRPCRouter({
     .input(z.string())
     .query(({ input, ctx }) =>
       getStoryMessages(input, ctx.db, ctx.session.user),
+    ),
+  newMessage: protectedProcedure
+    .input(newMessageInput)
+    .mutation(({ input, ctx }) =>
+      handleNewMessage(input, ctx.db, ctx.session.user),
     ),
 });

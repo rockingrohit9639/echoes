@@ -14,7 +14,7 @@ export default async function Home() {
         href="/story/new"
         className={cn(buttonVariants({ variant: "default" }), "no-underline")}
       >
-        Plan your next adventure
+        Start your next adventure
       </Link>
     </div>
   );

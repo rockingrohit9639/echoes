@@ -1,9 +1,10 @@
-import { type Message } from "@prisma/client";
+import Markdown from "~/components/markdown";
 import { cn } from "~/lib/utils";
+import { type StoryMessageSchema } from "~/server/api/routers/story/story.input";
 import { type BasicProps } from "~/types/basic";
 
 type MessageProps = BasicProps & {
-  message: Message;
+  message: StoryMessageSchema;
 };
 
 export default function Message({ className, style, message }: MessageProps) {
@@ -13,7 +14,7 @@ export default function Message({ className, style, message }: MessageProps) {
         {message.from === "human" ? "You" : "Echo"}
       </p>
 
-      <p>{message.content}</p>
+      <Markdown className="w-full">{message.data.content}</Markdown>
     </div>
   );
 }

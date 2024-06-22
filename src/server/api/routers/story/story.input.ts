@@ -40,3 +40,18 @@ export const newStoryOutput = z.object({
     .max(2000)
     .describe("Starting of the story to the user so the user can continue."),
 });
+
+export const newMessageInput = z.object({
+  storyId: z.string(),
+  message: z.string().min(1, "Please enter your choice").max(100, "Too long"),
+});
+
+export type NewMessageInput = z.infer<typeof newMessageInput>;
+
+export const storyMessageSchema = z.object({
+  type: z.enum(["human", "ai"]),
+  data: z.object({ content: z.string() }),
+  isInitial: z.boolean().optional().nullable().default(false),
+});
+
+export type StoryMessageSchema = z.infer<typeof storyMessageSchema>;

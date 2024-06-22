@@ -1,17 +1,30 @@
 import { type PrismaClient } from "@prisma/client";
 import { type User } from "next-auth";
 import {
+  type NewMessageInput,
   newStoryInput,
   newStoryOutput,
   type NewStoryInput,
+  type StoryMessageSchema,
+  storyMessageSchema,
 } from "./story.input";
 import { TRPCError } from "@trpc/server";
 import { getNewStoryPrompt } from "./story.prompt";
 import { gemini } from "~/lib/gemini";
-import { RunnableSequence } from "@langchain/core/runnables";
-import { PromptTemplate } from "@langchain/core/prompts";
+import {
+  RunnableSequence,
+  RunnableWithMessageHistory,
+} from "@langchain/core/runnables";
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+  PromptTemplate,
+} from "@langchain/core/prompts";
 import { ECHO_INTRO } from "~/lib/echo";
 import { StructuredOutputParser } from "langchain/output_parsers";
+import { MongoDBChatMessageHistory } from "@langchain/mongodb";
+import { messagesCollection } from "~/lib/mongodb";
+import { z } from "zod";
 
 export async function startNewStory(
   input: NewStoryInput,
@@ -44,24 +57,35 @@ export async function startNewStory(
         characterName: input.characterName,
         characterAppearance: input.characterAppearance,
         createdById: user.id,
-        messages: {
-          createMany: {
-            data: [
-              /* First instruction message to AI */
-              {
-                from: "system",
-                content: prompt,
-              },
-              /** Second message is the response from AI */
-              {
-                from: "ai",
-                content: newStory.content,
-              },
-            ],
-          },
-        },
       },
     });
+
+    const messages: StoryMessageSchema[] = [
+      {
+        type: "human",
+        data: { content: prompt },
+        isInitial: true,
+      },
+      {
+        type: "ai",
+        data: { content: newStory.content },
+        isInitial: false,
+      },
+    ];
+
+    await db.storyHistory.create({
+      data: { sessionId: storyCreated.id, messages },
+    });
+
+    // const chatMessageHistory = new MongoDBChatMessageHistory({
+    //   collection: messagesCollection,
+    //   sessionId: storyCreated.id,
+    // });
+
+    // await chatMessageHistory.addMessages([
+    //   new HumanMessage(prompt),
+    //   new AIMessage(newStory.content),
+    // ]);
 
     return storyCreated;
   } catch (cause) {
@@ -129,9 +153,77 @@ export async function getStoryMessages(
   user: User,
 ) {
   const story = await getStoryById(storyId, db, user);
-
-  return db.message.findMany({
-    where: { storyId: story.id },
-    orderBy: { createdAt: "desc" },
+  const storyHistory = await db.storyHistory.findFirst({
+    where: { sessionId: story.id },
   });
+
+  if (!storyHistory) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Story history not found!",
+    });
+  }
+
+  const parsedResponse = z
+    .array(storyMessageSchema)
+    .safeParse(storyHistory.messages);
+
+  if (!parsedResponse.success) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Found invalid data for story history!",
+    });
+  }
+
+  return parsedResponse.data;
+}
+
+export async function handleNewMessage(
+  input: NewMessageInput,
+  db: PrismaClient,
+  user: User,
+) {
+  try {
+    /**
+     * To handle a new message we have to build the previous conversation b/w the user and our AI model
+     * to do that we can fetch all messages of user
+     */
+    const story = await getStoryById(input.storyId, db, user);
+
+    const prompt = ChatPromptTemplate.fromMessages([
+      ["system", ECHO_INTRO],
+      new MessagesPlaceholder("messages"),
+      ["human", "{user_move}"],
+    ]);
+
+    const chain = prompt.pipe(gemini);
+
+    const chainWithHistory = new RunnableWithMessageHistory({
+      runnable: chain,
+      getMessageHistory: (sessionId: string) =>
+        new MongoDBChatMessageHistory({
+          collection: messagesCollection,
+          sessionId,
+        }),
+      inputMessagesKey: "user_move",
+      historyMessagesKey: "messages",
+    });
+
+    const result = await chainWithHistory.invoke(
+      { user_move: input.message },
+      { configurable: { sessionId: story.id } },
+    );
+
+    return {
+      type: "ai",
+      data: { content: result.content as string },
+      isInitial: false,
+    } as StoryMessageSchema;
+  } catch (cause) {
+    throw new TRPCError({
+      cause,
+      message: "Something went wrong",
+      code: "INTERNAL_SERVER_ERROR",
+    });
+  }
 }

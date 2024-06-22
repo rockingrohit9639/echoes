@@ -37,6 +37,7 @@ const config = {
     ],
     "no-console": "warn",
     "@typescript-eslint/no-unsafe-return": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
   },
 };
 module.exports = config;

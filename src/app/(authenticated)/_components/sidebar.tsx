@@ -49,7 +49,7 @@ export default function Sidebar({ className, style }: SidebarProps) {
           />
         </Link>
 
-        <NavLink className="mb-2" href="/story/new" icon={<PlusIcon />}>
+        <NavLink className="mb-4" href="/story/new" icon={<PlusIcon />}>
           new adventure
         </NavLink>
 

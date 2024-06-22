@@ -10,7 +10,7 @@ export default function Providers({ children }: ProvidersProps) {
   return (
     <TRPCReactProvider>
       <SessionProvider>
-        <Toaster />
+        <Toaster richColors />
         {children}
       </SessionProvider>
     </TRPCReactProvider>

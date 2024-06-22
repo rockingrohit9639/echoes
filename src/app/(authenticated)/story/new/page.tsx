@@ -65,6 +65,7 @@ export default function NewStory() {
 
       <div className="mb-4 flex items-center justify-end border-b border-dashed border-border pb-4">
         <Button
+          disabled={randomStoryMutation.isPending || newStoryMutation.isPending}
           loading={randomStoryMutation.isPending}
           onClick={() => {
             randomStoryMutation.mutate();
@@ -158,7 +159,14 @@ export default function NewStory() {
             )}
           />
 
-          <Button>Start Your Story!</Button>
+          <Button
+            disabled={
+              randomStoryMutation.isPending || newStoryMutation.isPending
+            }
+            loading={newStoryMutation.isPending}
+          >
+            Start Your Story!
+          </Button>
         </form>
       </Form>
     </div>
