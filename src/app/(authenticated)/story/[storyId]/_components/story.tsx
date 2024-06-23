@@ -4,7 +4,7 @@ import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
 import { type BasicProps } from "~/types/basic";
 import { match } from "ts-pattern";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import Message from "./message";
 import {
   Form,
@@ -31,7 +31,7 @@ type StoryProps = BasicProps & {
 
 export default function Story({ className, style, id }: StoryProps) {
   const utils = api.useUtils();
-  const messageContainerRef = useRef<React.ElementRef<"div">>(null);
+  const messagesContainerRef = useRef<React.ElementRef<"div">>(null);
 
   const form = useForm<NewMessageInput>({
     resolver: zodResolver(newMessageInput),
@@ -76,6 +76,21 @@ export default function Story({ className, style, id }: StoryProps) {
     form.reset();
   }
 
+  useEffect(function scrollMessageIntoView() {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.addEventListener(
+        "DOMNodeInserted",
+        (event) => {
+          const target = event.currentTarget as HTMLDivElement;
+
+          if (target) {
+            target.scroll({ top: target.scrollHeight, behavior: "smooth" });
+          }
+        },
+      );
+    }
+  }, []);
+
   return (
     <div
       className={cn(
@@ -84,14 +99,17 @@ export default function Story({ className, style, id }: StoryProps) {
       )}
       style={style}
     >
-      <div ref={messageContainerRef} className="flex-1">
+      <div
+        ref={messagesContainerRef}
+        className="hide-scrollbar flex-1 overflow-y-auto"
+      >
         {match(messagesQuery)
           .with({ status: "pending" }, () => (
             <div>
               {Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
-                  className="mb-2 h-8 w-full animate-pulse bg-muted-foreground/10"
+                  className="mb-2 h-20 w-full animate-pulse bg-muted-foreground/10"
                 />
               ))}
             </div>
@@ -102,7 +120,7 @@ export default function Story({ className, style, id }: StoryProps) {
             </div>
           ))
           .with({ status: "success" }, ({ data: messages }) => (
-            <div className="flex h-full flex-col justify-end overflow-y-auto">
+            <>
               {messages
                 .filter((m) => !m.isInitial)
                 .map((message, i) => (
@@ -110,9 +128,9 @@ export default function Story({ className, style, id }: StoryProps) {
                 ))}
 
               {newMessageMutation.isPending ? (
-                <p className="animate-pulse">Thinking...</p>
+                <p className="animate-pulse">Echo is thinking...</p>
               ) : null}
-            </div>
+            </>
           ))
           .exhaustive()}
       </div>
@@ -131,6 +149,7 @@ export default function Story({ className, style, id }: StoryProps) {
                     <Input
                       disabled={newMessageMutation.isPending}
                       placeholder="What's your move ?"
+                      autoComplete="off"
                       {...field}
                     />
                   </FormControl>

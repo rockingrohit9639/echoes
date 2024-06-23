@@ -9,10 +9,10 @@ export default async function StoryDetails({ params }: StoryDetailsProps) {
   const story = await api.story.findById(params.storyId);
 
   return (
-    <div className="grid h-full grid-cols-1 md:grid-cols-3">
+    <div className="grid h-full grid-cols-1 md:grid-cols-4">
       <Story
         id={story.id}
-        className="col-span-full md:col-span-2 md:border-r md:border-dashed md:border-border"
+        className="col-span-full overflow-hidden md:col-span-3 md:border-r md:border-dashed md:border-border"
       />
 
       <div className="col-span-1 hidden p-6 md:block">
