@@ -77,16 +77,6 @@ export async function startNewStory(
       data: { sessionId: storyCreated.id, messages },
     });
 
-    // const chatMessageHistory = new MongoDBChatMessageHistory({
-    //   collection: messagesCollection,
-    //   sessionId: storyCreated.id,
-    // });
-
-    // await chatMessageHistory.addMessages([
-    //   new HumanMessage(prompt),
-    //   new AIMessage(newStory.content),
-    // ]);
-
     return storyCreated;
   } catch (cause) {
     throw new TRPCError({
