@@ -9,6 +9,15 @@ Echoes is an interactive storytelling app that empowers you to craft your own ad
 **AI-powered Prompts**: Let AI nudge your creativity with narrative prompts based on your choices.
 **Branching Narratives**: Each decision leads you down a unique path, shaping the story's outcome.
 
+## Tech Stack
+
+- [NextJS](https://nextjs.org/)
+- [NextAuth](https://next-auth.js.org/)
+- [tRPC](https://trpc.io/)
+- [Langchain](https://js.langchain.com/v0.2/docs/introduction/)
+- [Google Gemini](https://gemini.google.com/?hl=en-IN)
+- [Create T3](https://create.t3.gg/)
+
 ## Setup guide
 
 ### Prerequisites
