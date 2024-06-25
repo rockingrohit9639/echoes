@@ -1,29 +1,45 @@
-# Create T3 App
+# Echoes: Interactive Storytelling with AI
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Echoes is an interactive storytelling app that empowers you to craft your own adventure with the help of artificial intelligence. Make choices, explore fantastical worlds, and see where your imagination and AI whispers guide you.
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+**Genre Selection**: Choose from a variety of genres to set the stage for your adventure.
+**Character Creation**: Shape your protagonist's appearance and personality traits.
+**AI-powered Prompts**: Let AI nudge your creativity with narrative prompts based on your choices.
+**Branching Narratives**: Each decision leads you down a unique path, shaping the story's outcome.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Setup guide
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+### Prerequisites
 
-## Learn More
+- Node.js (Download from [NodeJS](https://nodejs.org/))
+- pnpm
+- Google Gemini
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+### Setup
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+1. Fork repository
+2. Clone the Repository:
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+   ```bash
+   git clone https://github.com/your-username/echoes.git
+   cd echoes
+   ```
 
-## How do I deploy this?
+3. Install dependencies
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+   ```bash
+    pnpm install
+   ```
+
+4. Create a Google Cloud Project and setup OAuth Consent Screen
+5. Create OAuth app and get `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+6. Get gemini api key - [Get an API key](https://ai.google.dev/gemini-api/docs/api-key?authuser=2)
+7. Signup on langchain and get `LANGCHAIN_API_KEY`
+8. Create `.env` and add all variables from `.env.example`
+9. Run project in dev mode
+
+   ```bash
+   pnpm dev
+   ```
