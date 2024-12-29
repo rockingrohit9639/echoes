@@ -43,7 +43,7 @@ export const newStoryOutput = z.object({
 
 export const newMessageInput = z.object({
   storyId: z.string(),
-  message: z.string().min(1, "Please enter your choice").max(100, "Too long"),
+  message: z.string().min(1, "Please enter your choice"),
 });
 
 export type NewMessageInput = z.infer<typeof newMessageInput>;

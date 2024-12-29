@@ -137,7 +137,7 @@ export default function Story({ className, style, id }: StoryProps) {
       <div className="mt-4 h-16 border-t border-dashed border-border pt-4">
         <Form {...form}>
           <form
-            className="flex items-center gap-2"
+            className="flex gap-2"
             onSubmit={form.handleSubmit(handleNewMessageSubmit)}
           >
             <FormField
