@@ -31,6 +31,7 @@ type StoryProps = BasicProps & {
 
 export default function Story({ className, style, id }: StoryProps) {
   const utils = api.useUtils();
+  const containerEndRef = useRef<React.ElementRef<"div">>(null);
   const messagesContainerRef = useRef<React.ElementRef<"div">>(null);
 
   const form = useForm<NewMessageInput>({
@@ -54,6 +55,7 @@ export default function Story({ className, style, id }: StoryProps) {
         }
         return [...prev, message];
       });
+      setTimeout(scrollToBottom, 0);
     },
   });
 
@@ -74,42 +76,43 @@ export default function Story({ className, style, id }: StoryProps) {
     });
 
     form.reset();
+    setTimeout(scrollToBottom, 0);
   }
 
-  useEffect(function scrollMessageIntoView() {
+  function scrollToBottom() {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.addEventListener(
-        "DOMNodeInserted",
-        (event) => {
-          const target = event.currentTarget as HTMLDivElement;
-
-          if (target) {
-            target.scroll({ top: target.scrollHeight, behavior: "smooth" });
-          }
-        },
-      );
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight + 40,
+        behavior: "smooth",
+      });
     }
-  }, []);
+  }
+
+  useEffect(
+    function scrollToBottomOnLoad() {
+      if (messagesQuery.status === "success") {
+        scrollToBottom();
+      }
+    },
+    [messagesQuery.status],
+  );
 
   return (
     <div
-      className={cn(
-        "flex flex-col overflow-y-auto bg-dark px-6 pt-6",
-        className,
-      )}
+      className={cn("flex flex-col overflow-y-auto bg-dark", className)}
       style={style}
     >
       <div
         ref={messagesContainerRef}
-        className="hide-scrollbar flex-1 overflow-y-auto"
+        className="scrollbar-track-background scrollbar-thumb-gray-500 scrollbar-thin flex-1 overflow-y-auto rounded px-6 pt-6"
       >
         {match(messagesQuery)
           .with({ status: "pending" }, () => (
             <div>
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: 7 }).map((_, i) => (
                 <div
                   key={i}
-                  className="mb-2 h-20 w-full animate-pulse bg-muted-foreground/10"
+                  className="mb-2 h-20 w-full animate-pulse bg-muted-foreground/20"
                 />
               ))}
             </div>
@@ -127,6 +130,7 @@ export default function Story({ className, style, id }: StoryProps) {
                   <Message key={i} message={message} />
                 ))}
 
+              <div ref={containerEndRef} />
               {newMessageMutation.isPending ? (
                 <p className="animate-pulse">Echo is thinking...</p>
               ) : null}
@@ -134,7 +138,7 @@ export default function Story({ className, style, id }: StoryProps) {
           ))
           .exhaustive()}
       </div>
-      <div className="mt-4 h-16 border-t border-dashed border-border pt-4">
+      <div className="mt-4 h-16 border-t border-dashed border-border px-6 pt-4">
         <Form {...form}>
           <form
             className="flex gap-2"

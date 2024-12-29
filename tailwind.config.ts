@@ -3,6 +3,7 @@ import { fontFamily } from "tailwindcss/defaultTheme";
 import colors from "tailwindcss/colors";
 import animate from "tailwindcss-animate";
 import typography from "@tailwindcss/typography";
+import scrollbar from "tailwind-scrollbar";
 
 export default {
   content: ["./src/**/*.tsx"],
@@ -43,5 +44,5 @@ export default {
       pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
     },
   },
-  plugins: [animate, typography],
+  plugins: [animate, typography, scrollbar],
 } satisfies Config;

@@ -15,7 +15,7 @@ export default function Markdown({
   return (
     <div
       className={cn(
-        "prose max-w-full text-primary prose-h1:text-primary prose-h2:text-primary prose-p:text-primary",
+        "prose max-w-full text-primary prose-h1:text-primary prose-h2:text-primary prose-p:text-primary prose-strong:text-white",
         className,
       )}
       style={style}
