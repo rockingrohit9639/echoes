@@ -23,6 +23,7 @@ export const env = createEnv({
     GOOGLE_API_KEY: z.string(),
     LANGCHAIN_TRACING_V2: z.string(),
     LANGCHAIN_API_KEY: z.string(),
+    GOOGLE_CLOUD_API_KEY: z.string().min(1),
   },
 
   client: {},
@@ -37,6 +38,7 @@ export const env = createEnv({
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
     LANGCHAIN_TRACING_V2: process.env.LANGCHAIN_TRACING_V2,
     LANGCHAIN_API_KEY: process.env.LANGCHAIN_API_KEY,
+    GOOGLE_CLOUD_API_KEY: process.env.GOOGLE_CLOUD_API_KEY,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   /**
