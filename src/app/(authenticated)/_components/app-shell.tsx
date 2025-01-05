@@ -17,11 +17,11 @@ export default function AppShell({
       className={cn("flex h-screen w-full overflow-hidden", className)}
       style={style}
     >
-      <div className="fixed inset-y-0 hidden w-64 border-r border-dashed border-border bg-background transition-all xl:block">
+      <div className="fixed inset-y-0 hidden w-64 border-r border-dashed border-border bg-background transition-all lg:block">
         <Sidebar />
       </div>
-      <main className="flex w-full flex-1 flex-col overflow-auto xl:pl-64">
-        <header className="flex h-16 items-center justify-between border-b border-dashed px-6 xl:hidden">
+      <main className="flex w-full flex-1 flex-col overflow-auto lg:pl-64">
+        <header className="flex h-16 items-center justify-between border-b border-dashed px-6 lg:hidden">
           <Link href="/" className="block">
             <Image
               src="/logo.png"
