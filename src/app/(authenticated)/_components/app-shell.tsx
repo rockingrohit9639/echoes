@@ -1,6 +1,9 @@
 import { cn } from "~/lib/utils";
 import { type BasicProps } from "~/types/basic";
 import Sidebar from "./sidebar";
+import Link from "next/link";
+import Image from "next/image";
+import MobileSidebar from "./mobile-sidebar";
 
 type AppShellProps = React.PropsWithChildren<BasicProps>;
 
@@ -18,6 +21,20 @@ export default function AppShell({
         <Sidebar />
       </div>
       <main className="flex w-full flex-1 flex-col overflow-auto xl:pl-64">
+        <header className="flex h-16 items-center justify-between border-b border-dashed px-6 xl:hidden">
+          <Link href="/" className="block">
+            <Image
+              src="/logo.png"
+              alt="logo"
+              width={40}
+              height={40}
+              className="w-8 object-contain grayscale hover:grayscale-0"
+            />
+          </Link>
+
+          <MobileSidebar />
+        </header>
+
         {children}
       </main>
     </div>
