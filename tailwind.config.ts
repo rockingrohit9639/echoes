@@ -1,6 +1,5 @@
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
-import colors from "tailwindcss/colors";
 import animate from "tailwindcss-animate";
 import typography from "@tailwindcss/typography";
 import scrollbar from "tailwind-scrollbar";
