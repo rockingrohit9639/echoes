@@ -19,7 +19,7 @@ export default function SidebarStories({
         ? storiesQuery.data.map((story) => (
             <NavLink
               key={story.id}
-              href={`/story/${story.id}`}
+              href={`/story/${story.id}${story.isCompleted ? "/read" : ""}`}
               className="text-ellipsis text-sm"
             >
               {story.title}

@@ -6,6 +6,7 @@ import {
   getStoryMessages,
   getUserStories,
   handleNewMessage,
+  publishStory,
   startNewStory,
   startRandomStory,
 } from "./story.service";
@@ -34,5 +35,10 @@ export const storyRouter = createTRPCRouter({
     .input(newMessageInput)
     .mutation(({ input, ctx }) =>
       handleNewMessage(input, ctx.db, ctx.session.user),
+    ),
+  publish: protectedProcedure
+    .input(z.string())
+    .mutation(({ input, ctx }) =>
+      publishStory(input, ctx.db, ctx.session.user),
     ),
 });

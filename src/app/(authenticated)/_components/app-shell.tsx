@@ -21,7 +21,7 @@ export default function AppShell({
         <Sidebar />
       </div>
       <main className="flex w-full flex-1 flex-col overflow-auto lg:pl-64">
-        <header className="flex h-16 items-center justify-between border-b border-dashed px-6 lg:hidden">
+        <header className="flex items-center justify-between border-b border-dashed px-6 py-2 lg:hidden">
           <Link href="/" className="block">
             <Image
               src="/logo.png"

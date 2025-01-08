@@ -1,5 +1,6 @@
 import { api } from "~/trpc/server";
 import Story from "./_components/story";
+import { redirect } from "next/navigation";
 
 type StoryDetailsProps = {
   params: { storyId: string };
@@ -7,6 +8,9 @@ type StoryDetailsProps = {
 
 export default async function StoryDetails({ params }: StoryDetailsProps) {
   const story = await api.story.findById(params.storyId);
+  if (story.isCompleted) {
+    return redirect(`/story/${params.storyId}/read`);
+  }
 
   return (
     <div className="grid h-full grid-cols-1 md:grid-cols-4">

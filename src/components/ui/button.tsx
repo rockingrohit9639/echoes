@@ -34,7 +34,7 @@ export const buttonVariants = cva(
 const iconVariants = cva("flex-shrink-0", {
   variants: {
     type: {
-      withChildren: "!h-4 !w-4",
+      withChildren: "!h-4 !w-4 mr-1",
       withoutChildren: "block !h-4 !w-4",
     },
   },
@@ -86,7 +86,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       : null;
 
     return (
-      <BaseButton {...props} asChild={false} data-loading={loading} ref={ref}>
+      <BaseButton
+        {...props}
+        asChild={false}
+        data-loading={loading}
+        ref={ref}
+        disabled={props.disabled ?? loading}
+      >
         {loading ? (
           <Spinner
             className={cn(

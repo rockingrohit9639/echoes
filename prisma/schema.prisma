@@ -94,7 +94,6 @@ model FinalStory {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    chapterId String   @db.ObjectId
 }
 
 model Chapter {
