@@ -20,9 +20,9 @@ export function getPublishStoryPrompt() {
   return `Based on our conversation history, create a compelling story with a clear title, structured chapters, and an engaging narrative. Incorporate all key elements such
 as characters, tone and plot details mentioned in the conversation. Ensure the tone of the story matches the theme implied by the inputs (e.g horro, adventure, mystery).
 Add dialogues where necessary to bring story to life. Double quote imporant lines from the story.
-You have to divide the story into multiple chapters.
+You have to divide the story into multiple chapters. Keep the content sufficent enough in each chapter so it actually looks a full chapter and not a paragraph.
 You have to give me response in JSON format. DO NOT GIVE ANYTHING ELSE.
-Give me an array of objec in JSON. Each object will have the following fields
+Give me an array of object in JSON. Each object will have the following fields
 title: title for the chapter
 content: content for the chapter. It should be in markdown format. All important points should be highlighted.
 Make sure to give me JSON only.

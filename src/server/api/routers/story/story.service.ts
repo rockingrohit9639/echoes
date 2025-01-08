@@ -265,3 +265,26 @@ export async function publishStory(storyId: string, db: PrismaClient, user: User
     })
   }
 }
+
+export async function getFinalStoryByStoryId(storyId: string, db: PrismaClient, user: User) {
+  const story = await db.story.findFirst({
+    where: { id: storyId, createdById: user.id },
+    include: { finalStory: { include: { chapters: true } } },
+  })
+
+  if (!story) {
+    throw new TRPCError({
+      message: 'Story not found.',
+      code: 'NOT_FOUND',
+    })
+  }
+
+  if (!story.finalStory) {
+    throw new TRPCError({
+      message: 'Story is not completed yet.',
+      code: 'FORBIDDEN',
+    })
+  }
+
+  return story
+}

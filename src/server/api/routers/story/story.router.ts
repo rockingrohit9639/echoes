@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../../trpc'
 import { newMessageInput, newStoryInput } from './story.input'
 import {
+  getFinalStoryByStoryId,
   getStoryById,
   getStoryMessages,
   getUserStories,
@@ -29,4 +30,7 @@ export const storyRouter = createTRPCRouter({
   publish: protectedProcedure
     .input(z.string())
     .mutation(({ input, ctx }) => publishStory(input, ctx.db, ctx.session.user)),
+  getFinalStoryByStoryId: protectedProcedure
+    .input(z.string())
+    .query(({ input, ctx }) => getFinalStoryByStoryId(input, ctx.db, ctx.session.user)),
 })
