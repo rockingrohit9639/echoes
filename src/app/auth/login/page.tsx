@@ -1,12 +1,12 @@
-"use client";
+'use client'
 
-import { signIn } from "next-auth/react";
-import Image from "next/image";
+import { signIn } from 'next-auth/react'
+import Image from 'next/image'
 
 export default function Login() {
   return (
     <div className="grid h-screen grid-cols-1 overflow-hidden md:grid-cols-2">
-      <div className="border-border hidden border-r border-dashed md:block">
+      <div className="hidden border-r border-dashed border-border md:block">
         <Image
           width={1000}
           height={900}
@@ -17,20 +17,20 @@ export default function Login() {
       </div>
       <div className="relative p-8">
         <div className="absolute right-8 top-8 flex items-center">
-          <div className="bg-primary mr-1 size-2.5" />
+          <div className="mr-1 size-2.5 bg-primary" />
           <p className="text-sm">Echoes</p>
         </div>
 
         <div className="flex h-full flex-col justify-center">
           <h1 className="mb-1 text-2xl font-bold">Welcome to Echoes!</h1>
-          <p className="text-muted-foreground mb-8 text-sm italic">
+          <p className="mb-8 text-sm italic text-muted-foreground">
             Craft your own story. Every choice echoes through your adventure.
           </p>
 
           <button
-            className="bg-border group flex w-max items-center gap-2 px-6 py-4"
+            className="group flex w-max items-center gap-2 bg-border px-6 py-4"
             onClick={async () => {
-              await signIn("google");
+              await signIn('google')
             }}
           >
             <Image
@@ -46,5 +46,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  );
+  )
 }

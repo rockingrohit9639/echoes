@@ -1,123 +1,110 @@
-"use client";
+'use client'
 
-import { cn } from "~/lib/utils";
-import { api } from "~/trpc/react";
-import { type BasicProps } from "~/types/basic";
-import { match } from "ts-pattern";
-import { useEffect, useRef } from "react";
-import Message from "./message";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "~/components/ui/form";
-import { useForm } from "react-hook-form";
-import {
-  newMessageInput,
-  type StoryMessageSchema,
-  type NewMessageInput,
-} from "~/server/api/routers/story/story.input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "~/components/ui/input";
-import { Button } from "~/components/ui/button";
-import { BookPlusIcon, SendIcon } from "lucide-react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { cn } from '~/lib/utils'
+import { api } from '~/trpc/react'
+import { type BasicProps } from '~/types/basic'
+import { match } from 'ts-pattern'
+import { useEffect, useRef } from 'react'
+import Message from './message'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '~/components/ui/form'
+import { useForm } from 'react-hook-form'
+import { newMessageInput, type StoryMessageSchema, type NewMessageInput } from '~/server/api/routers/story/story.input'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Input } from '~/components/ui/input'
+import { Button } from '~/components/ui/button'
+import { BookPlusIcon, SendIcon } from 'lucide-react'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 type StoryProps = BasicProps & {
-  id: string;
-};
+  id: string
+}
 
 export default function Story({ className, style, id }: StoryProps) {
-  const utils = api.useUtils();
-  const containerEndRef = useRef<React.ElementRef<"div">>(null);
-  const messagesContainerRef = useRef<React.ElementRef<"div">>(null);
-  const router = useRouter();
+  const utils = api.useUtils()
+  const containerEndRef = useRef<React.ElementRef<'div'>>(null)
+  const messagesContainerRef = useRef<React.ElementRef<'div'>>(null)
+  const router = useRouter()
 
   const form = useForm<NewMessageInput>({
     resolver: zodResolver(newMessageInput),
     defaultValues: {
       storyId: id,
-      message: "",
+      message: '',
     },
-  });
+  })
 
-  const messagesQuery = api.story.findMessages.useQuery(id);
+  const messagesQuery = api.story.findMessages.useQuery(id)
 
   const newMessageMutation = api.story.newMessage.useMutation({
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message)
     },
     onSuccess: (message) => {
       utils.story.findMessages.setData(id, (prev) => {
         if (!prev) {
-          return [message];
+          return [message]
         }
-        return [...prev, message];
-      });
-      setTimeout(scrollToBottom, 0);
+        return [...prev, message]
+      })
+      setTimeout(scrollToBottom, 0)
     },
-  });
+  })
   const publishStoryMutation = api.story.publish.useMutation({
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message)
     },
     onSuccess: () => {
-      router.replace(`/story/${id}/read`);
+      router.replace(`/story/${id}/read`)
     },
-  });
+  })
 
   function handleNewMessageSubmit(input: NewMessageInput) {
-    newMessageMutation.mutate(input);
+    newMessageMutation.mutate(input)
     utils.story.findMessages.setData(id, (prev) => {
       const newMessage: StoryMessageSchema = {
-        type: "human",
+        type: 'human',
         isInitial: false,
         data: { content: input.message },
-      };
-
-      if (!prev) {
-        return [newMessage];
       }
 
-      return [...prev, newMessage];
-    });
+      if (!prev) {
+        return [newMessage]
+      }
 
-    form.reset();
-    setTimeout(scrollToBottom, 0);
+      return [...prev, newMessage]
+    })
+
+    form.reset()
+    setTimeout(scrollToBottom, 0)
   }
 
   function scrollToBottom() {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTo({
         top: messagesContainerRef.current.scrollHeight + 40,
-        behavior: "smooth",
-      });
+        behavior: 'smooth',
+      })
     }
   }
 
   useEffect(
     function scrollToBottomOnLoad() {
-      if (messagesQuery.status === "success") {
-        scrollToBottom();
+      if (messagesQuery.status === 'success') {
+        scrollToBottom()
       }
     },
     [messagesQuery.status],
-  );
+  )
 
   return (
-    <div
-      className={cn("flex flex-col overflow-y-auto bg-dark", className)}
-      style={style}
-    >
+    <div className={cn('flex flex-col overflow-y-auto bg-dark', className)} style={style}>
       <div className="flex h-16 items-center justify-end border-b border-dashed px-6">
         <Button
           icon={<BookPlusIcon />}
           loading={publishStoryMutation.isPending}
           onClick={() => {
-            publishStoryMutation.mutate(id);
+            publishStoryMutation.mutate(id)
           }}
         >
           Publish Story
@@ -128,22 +115,17 @@ export default function Story({ className, style, id }: StoryProps) {
         className="flex-1 overflow-y-auto rounded px-6 pt-6 scrollbar-thin scrollbar-track-background scrollbar-thumb-gray-500"
       >
         {match(messagesQuery)
-          .with({ status: "pending" }, () => (
+          .with({ status: 'pending' }, () => (
             <div>
               {Array.from({ length: 7 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="mb-2 h-20 w-full animate-pulse bg-muted-foreground/20"
-                />
+                <div key={i} className="mb-2 h-20 w-full animate-pulse bg-muted-foreground/20" />
               ))}
             </div>
           ))
-          .with({ status: "error" }, ({ error }) => (
-            <div className="flex items-center justify-center text-error">
-              {error.message}
-            </div>
+          .with({ status: 'error' }, ({ error }) => (
+            <div className="flex items-center justify-center text-error">{error.message}</div>
           ))
-          .with({ status: "success" }, ({ data: messages }) => (
+          .with({ status: 'success' }, ({ data: messages }) => (
             <>
               {messages
                 .filter((m) => !m.isInitial)
@@ -152,19 +134,14 @@ export default function Story({ className, style, id }: StoryProps) {
                 ))}
 
               <div ref={containerEndRef} />
-              {newMessageMutation.isPending ? (
-                <p className="animate-pulse">Echo is thinking...</p>
-              ) : null}
+              {newMessageMutation.isPending ? <p className="animate-pulse">Echo is thinking...</p> : null}
             </>
           ))
           .exhaustive()}
       </div>
       <div className="mt-4 h-16 border-t border-dashed border-border px-6 pt-4">
         <Form {...form}>
-          <form
-            className="flex gap-2"
-            onSubmit={form.handleSubmit(handleNewMessageSubmit)}
-          >
+          <form className="flex gap-2" onSubmit={form.handleSubmit(handleNewMessageSubmit)}>
             <FormField
               control={form.control}
               name="message"
@@ -192,5 +169,5 @@ export default function Story({ className, style, id }: StoryProps) {
         </Form>
       </div>
     </div>
-  );
+  )
 }

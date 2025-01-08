@@ -1,4 +1,4 @@
 export type BasicProps = {
-  className?: string;
-  style?: React.CSSProperties;
-};
+  className?: string
+  style?: React.CSSProperties
+}

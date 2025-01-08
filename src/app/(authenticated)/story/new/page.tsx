@@ -1,63 +1,52 @@
-"use client";
+'use client'
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
-import { Textarea } from "~/components/ui/textarea";
-import { Button } from "~/components/ui/button";
-import { api } from "~/trpc/react";
-import {
-  newStoryInput,
-  type NewStoryInput,
-} from "~/server/api/routers/story/story.input";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
+import { Button } from '~/components/ui/button'
+import { api } from '~/trpc/react'
+import { newStoryInput, type NewStoryInput } from '~/server/api/routers/story/story.input'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 export default function NewStory() {
-  const router = useRouter();
+  const router = useRouter()
 
-  const utils = api.useUtils();
+  const utils = api.useUtils()
 
   const form = useForm<NewStoryInput>({
     resolver: zodResolver(newStoryInput),
     defaultValues: {
-      genre: "",
-      storyBase: "",
-      characterName: "",
-      characterAppearance: "",
+      genre: '',
+      storyBase: '',
+      characterName: '',
+      characterAppearance: '',
     },
-  });
+  })
 
   const newStoryMutation = api.story.new.useMutation({
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message)
     },
     onSuccess: async (storyCreated) => {
-      await utils.story.findAll.invalidate();
-      router.replace(`/story/${storyCreated.id}`);
-      toast.success("The world awaits. Let your story unfold.");
+      await utils.story.findAll.invalidate()
+      router.replace(`/story/${storyCreated.id}`)
+      toast.success('The world awaits. Let your story unfold.')
     },
-  });
+  })
 
   const randomStoryMutation = api.story.startRandomStory.useMutation({
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message)
     },
     onSuccess: async (storyCreated) => {
-      await utils.story.findAll.invalidate();
-      router.replace(`/story/${storyCreated.id}`);
-      toast.success("The world awaits. Let your story unfold.");
+      await utils.story.findAll.invalidate()
+      router.replace(`/story/${storyCreated.id}`)
+      toast.success('The world awaits. Let your story unfold.')
     },
-  });
+  })
 
   return (
     <div className="p-6">
@@ -68,7 +57,7 @@ export default function NewStory() {
           disabled={randomStoryMutation.isPending || newStoryMutation.isPending}
           loading={randomStoryMutation.isPending}
           onClick={() => {
-            randomStoryMutation.mutate();
+            randomStoryMutation.mutate()
           }}
         >
           ✨ Surprise me
@@ -78,7 +67,7 @@ export default function NewStory() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit((input) => {
-            newStoryMutation.mutate(input);
+            newStoryMutation.mutate(input)
           })}
         >
           <FormField
@@ -91,9 +80,8 @@ export default function NewStory() {
                   <Input placeholder="e.g., fantasy" {...field} />
                 </FormControl>
                 <FormDescription>
-                  Choose your genre: Dive into a world of fantasy, unravel a
-                  thrilling mystery, explore the cosmos in sci-fi, or embark on
-                  a romantic adventure
+                  Choose your genre: Dive into a world of fantasy, unravel a thrilling mystery, explore the cosmos in
+                  sci-fi, or embark on a romantic adventure
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -107,11 +95,7 @@ export default function NewStory() {
               <FormItem>
                 <FormLabel>Story base</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder="A forgotten forest..."
-                    rows={5}
-                    {...field}
-                  />
+                  <Textarea placeholder="A forgotten forest..." rows={5} {...field} />
                 </FormControl>
                 <FormDescription>Write the base of your story</FormDescription>
 
@@ -120,9 +104,7 @@ export default function NewStory() {
             )}
           />
 
-          <div className="my-4 border-y border-dashed border-border py-4">
-            Who Will You Be?
-          </div>
+          <div className="my-4 border-y border-dashed border-border py-4">Who Will You Be?</div>
 
           <FormField
             control={form.control}
@@ -145,24 +127,16 @@ export default function NewStory() {
               <FormItem className="mb-4">
                 <FormLabel>Appearance</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder="Let others see you"
-                    rows={5}
-                    {...field}
-                  />
+                  <Textarea placeholder="Let others see you" rows={5} {...field} />
                 </FormControl>
-                <FormDescription>
-                  Briefly describe your character&apos;s appearance.
-                </FormDescription>
+                <FormDescription>Briefly describe your character&apos;s appearance.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
           <Button
-            disabled={
-              randomStoryMutation.isPending || newStoryMutation.isPending
-            }
+            disabled={randomStoryMutation.isPending || newStoryMutation.isPending}
             loading={newStoryMutation.isPending}
           >
             Start Your Story!
@@ -170,5 +144,5 @@ export default function NewStory() {
         </form>
       </Form>
     </div>
-  );
+  )
 }

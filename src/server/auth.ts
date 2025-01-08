@@ -1,14 +1,10 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import {
-  getServerSession,
-  type DefaultSession,
-  type NextAuthOptions,
-} from "next-auth";
-import { type Adapter } from "next-auth/adapters";
-import GoogleProvider from "next-auth/providers/google";
-import { env } from "~/env";
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import { getServerSession, type DefaultSession, type NextAuthOptions } from 'next-auth'
+import { type Adapter } from 'next-auth/adapters'
+import GoogleProvider from 'next-auth/providers/google'
+import { env } from '~/env'
 
-import { db } from "~/server/db";
+import { db } from '~/server/db'
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -16,13 +12,13 @@ import { db } from "~/server/db";
  *
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  */
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session extends DefaultSession {
     user: {
-      id: string;
+      id: string
       // ...other properties
       // role: UserRole;
-    } & DefaultSession["user"];
+    } & DefaultSession['user']
   }
 
   // interface User {
@@ -38,7 +34,7 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   pages: {
-    signIn: "/auth/login",
+    signIn: '/auth/login',
   },
   callbacks: {
     session: ({ session, user }) => ({
@@ -56,7 +52,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-};
+}
 
 /**
  * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
@@ -70,12 +66,10 @@ export const getServerAuthSession = () => getServerSession(authOptions)
  * if session is not found this function will throw an error
  */
 export async function ensureAuthSession() {
-  const session = await getServerAuthSession();
+  const session = await getServerAuthSession()
   if (!session) {
-    throw new Error(
-      "ensureAuthSession must be used in authenticated routes only",
-    );
+    throw new Error('ensureAuthSession must be used in authenticated routes only')
   }
 
-  return session;
+  return session
 }

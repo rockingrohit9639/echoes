@@ -1,5 +1,5 @@
-import { type PrismaClient } from "@prisma/client";
-import { type User } from "next-auth";
+import { type PrismaClient } from '@prisma/client'
+import { type User } from 'next-auth'
 import {
   type NewMessageInput,
   newStoryInput,
@@ -7,48 +7,35 @@ import {
   type NewStoryInput,
   type StoryMessageSchema,
   storyMessageSchema,
-} from "./story.input";
-import { TRPCError } from "@trpc/server";
-import { getNewStoryPrompt, getPublishStoryPrompt } from "./story.prompt";
-import { gemini } from "~/lib/gemini";
-import {
-  RunnableSequence,
-  RunnableWithMessageHistory,
-} from "@langchain/core/runnables";
-import {
-  ChatPromptTemplate,
-  MessagesPlaceholder,
-  PromptTemplate,
-} from "@langchain/core/prompts";
-import { ECHO_INTRO } from "~/lib/echo";
-import { StructuredOutputParser } from "langchain/output_parsers";
-import { MongoDBChatMessageHistory } from "@langchain/mongodb";
-import { messagesCollection } from "~/lib/mongodb";
-import { z } from "zod";
-import { validateJSONResponse } from "~/lib/parser";
+} from './story.input'
+import { TRPCError } from '@trpc/server'
+import { getNewStoryPrompt, getPublishStoryPrompt } from './story.prompt'
+import { gemini } from '~/lib/gemini'
+import { RunnableSequence, RunnableWithMessageHistory } from '@langchain/core/runnables'
+import { ChatPromptTemplate, MessagesPlaceholder, PromptTemplate } from '@langchain/core/prompts'
+import { ECHO_INTRO } from '~/lib/echo'
+import { StructuredOutputParser } from 'langchain/output_parsers'
+import { MongoDBChatMessageHistory } from '@langchain/mongodb'
+import { messagesCollection } from '~/lib/mongodb'
+import { z } from 'zod'
+import { validateJSONResponse } from '~/lib/parser'
 
-export async function startNewStory(
-  input: NewStoryInput,
-  db: PrismaClient,
-  user: User,
-) {
+export async function startNewStory(input: NewStoryInput, db: PrismaClient, user: User) {
   try {
-    const parser = StructuredOutputParser.fromZodSchema(newStoryOutput);
+    const parser = StructuredOutputParser.fromZodSchema(newStoryOutput)
 
     const chain = RunnableSequence.from([
-      PromptTemplate.fromTemplate(
-        `${ECHO_INTRO}. \n{format_instructions}\n{question}`,
-      ),
+      PromptTemplate.fromTemplate(`${ECHO_INTRO}. \n{format_instructions}\n{question}`),
       gemini,
       parser,
-    ]);
+    ])
 
-    const prompt = getNewStoryPrompt(input);
+    const prompt = getNewStoryPrompt(input)
 
     const newStory = await chain.invoke({
       question: prompt,
       format_instructions: parser.getFormatInstructions(),
-    });
+    })
 
     const storyCreated = await db.story.create({
       data: {
@@ -59,135 +46,123 @@ export async function startNewStory(
         characterAppearance: input.characterAppearance,
         createdById: user.id,
       },
-    });
+    })
 
     const messages: StoryMessageSchema[] = [
       {
-        type: "human",
+        type: 'human',
         data: { content: prompt },
         isInitial: true,
       },
       {
-        type: "ai",
+        type: 'ai',
         data: { content: newStory.content },
         isInitial: false,
       },
-    ];
+    ]
 
     await db.storyHistory.create({
       data: { sessionId: storyCreated.id, messages },
-    });
+    })
 
-    return storyCreated;
+    return storyCreated
   } catch (cause) {
     throw new TRPCError({
       cause,
-      message: "Something went wrong",
-      code: "INTERNAL_SERVER_ERROR",
-    });
+      message: 'Something went wrong',
+      code: 'INTERNAL_SERVER_ERROR',
+    })
   }
 }
 
 export async function startRandomStory(db: PrismaClient, user: User) {
   try {
-    const parser = StructuredOutputParser.fromZodSchema(newStoryInput);
+    const parser = StructuredOutputParser.fromZodSchema(newStoryInput)
 
     const chain = RunnableSequence.from([
-      PromptTemplate.fromTemplate(
-        `${ECHO_INTRO}. \n{format_instructions}\n{question}`,
-      ),
+      PromptTemplate.fromTemplate(`${ECHO_INTRO}. \n{format_instructions}\n{question}`),
       gemini,
       parser,
-    ]);
+    ])
 
     const storyData = await chain.invoke({
       question:
-        "Start a new random story for the user. You have to give the starting of the story to the user so the user can continue.",
+        'Start a new random story for the user. You have to give the starting of the story to the user so the user can continue.',
       format_instructions: parser.getFormatInstructions(),
-    });
+    })
 
-    return startNewStory(storyData, db, user);
+    return startNewStory(storyData, db, user)
   } catch (cause) {
     throw new TRPCError({
       cause,
-      message: "Something went wrong",
-      code: "INTERNAL_SERVER_ERROR",
-    });
+      message: 'Something went wrong',
+      code: 'INTERNAL_SERVER_ERROR',
+    })
   }
 }
 
 export async function getStoryById(id: string, db: PrismaClient, user: User) {
   const story = await db.story.findFirst({
     where: { id, createdById: user.id },
-  });
+  })
 
   if (!story) {
     throw new TRPCError({
-      message: "Story not found!",
-      code: "NOT_FOUND",
-    });
+      message: 'Story not found!',
+      code: 'NOT_FOUND',
+    })
   }
 
-  return story;
+  return story
 }
 
 export async function getUserStories(user: User, db: PrismaClient) {
   return db.story.findMany({
     where: { createdById: user.id },
     select: { id: true, title: true, isCompleted: true },
-  });
+  })
 }
 
-export async function getStoryMessages(
-  storyId: string,
-  db: PrismaClient,
-  user: User,
-) {
-  const story = await getStoryById(storyId, db, user);
+export async function getStoryMessages(storyId: string, db: PrismaClient, user: User) {
+  const story = await getStoryById(storyId, db, user)
   const storyHistory = await db.storyHistory.findFirst({
     where: { sessionId: story.id },
-  });
+  })
 
   if (!storyHistory) {
     throw new TRPCError({
-      code: "NOT_FOUND",
-      message: "Story history not found!",
-    });
+      code: 'NOT_FOUND',
+      message: 'Story history not found!',
+    })
   }
 
-  const parsedResponse = z
-    .array(storyMessageSchema)
-    .safeParse(storyHistory.messages);
+  const parsedResponse = z.array(storyMessageSchema).safeParse(storyHistory.messages)
 
   if (!parsedResponse.success) {
     throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Found invalid data for story history!",
-    });
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Found invalid data for story history!',
+    })
   }
 
-  return parsedResponse.data;
+  return parsedResponse.data
 }
 
-export async function handleNewMessage(
-  input: NewMessageInput,
-  db: PrismaClient,
-  user: User,
-) {
+export async function handleNewMessage(input: NewMessageInput, db: PrismaClient, user: User) {
   try {
     /**
      * To handle a new message we have to build the previous conversation b/w the user and our AI model
      * to do that we can fetch all messages of user
      */
-    const story = await getStoryById(input.storyId, db, user);
+    const story = await getStoryById(input.storyId, db, user)
 
     const prompt = ChatPromptTemplate.fromMessages([
-      ["system", ECHO_INTRO],
-      new MessagesPlaceholder("messages"),
-      ["human", "{user_move}"],
-    ]);
+      ['system', ECHO_INTRO],
+      new MessagesPlaceholder('messages'),
+      ['human', '{user_move}'],
+    ])
 
-    const chain = prompt.pipe(gemini);
+    const chain = prompt.pipe(gemini)
 
     const chainWithHistory = new RunnableWithMessageHistory({
       runnable: chain,
@@ -196,58 +171,54 @@ export async function handleNewMessage(
           collection: messagesCollection,
           sessionId,
         }),
-      inputMessagesKey: "user_move",
-      historyMessagesKey: "messages",
-    });
+      inputMessagesKey: 'user_move',
+      historyMessagesKey: 'messages',
+    })
 
     const result = await chainWithHistory.invoke(
       { user_move: input.message },
       { configurable: { sessionId: story.id } },
-    );
+    )
 
     return {
-      type: "ai",
+      type: 'ai',
       data: { content: result.content as string },
       isInitial: false,
-    } as StoryMessageSchema;
+    } as StoryMessageSchema
   } catch (cause) {
     throw new TRPCError({
       cause,
-      message: "Something went wrong",
-      code: "INTERNAL_SERVER_ERROR",
-    });
+      message: 'Something went wrong',
+      code: 'INTERNAL_SERVER_ERROR',
+    })
   }
 }
 
-export async function publishStory(
-  storyId: string,
-  db: PrismaClient,
-  user: User,
-) {
+export async function publishStory(storyId: string, db: PrismaClient, user: User) {
   const story = await db.story.findFirst({
     where: { id: storyId, createdById: user.id },
-  });
+  })
   if (!story) {
     throw new TRPCError({
-      message: "Story not found.",
-      code: "NOT_FOUND",
-    });
+      message: 'Story not found.',
+      code: 'NOT_FOUND',
+    })
   }
 
   if (story.isCompleted) {
     throw new TRPCError({
-      message: "Story is already completed.",
-      code: "BAD_REQUEST",
-    });
+      message: 'Story is already completed.',
+      code: 'BAD_REQUEST',
+    })
   }
 
   const prompt = ChatPromptTemplate.fromMessages([
-    ["system", ECHO_INTRO],
-    new MessagesPlaceholder("messages"),
-    ["human", "{user_move}"],
-  ]);
+    ['system', ECHO_INTRO],
+    new MessagesPlaceholder('messages'),
+    ['human', '{user_move}'],
+  ])
 
-  const chain = prompt.pipe(gemini);
+  const chain = prompt.pipe(gemini)
 
   const chainWithHistory = new RunnableWithMessageHistory({
     runnable: chain,
@@ -256,20 +227,20 @@ export async function publishStory(
         collection: messagesCollection,
         sessionId,
       }),
-    inputMessagesKey: "user_move",
-    historyMessagesKey: "messages",
-  });
+    inputMessagesKey: 'user_move',
+    historyMessagesKey: 'messages',
+  })
 
   const result = await chainWithHistory.invoke(
     { user_move: getPublishStoryPrompt() },
     { configurable: { sessionId: story.id } },
-  );
+  )
 
   try {
     const chapters = validateJSONResponse(
       result.content as string,
       z.object({ title: z.string(), content: z.string() }).array(),
-    );
+    )
 
     await db.story.update({
       where: { id: storyId },
@@ -283,14 +254,14 @@ export async function publishStory(
           },
         },
       },
-    });
+    })
 
-    return { success: true };
+    return { success: true }
   } catch (cause) {
     throw new TRPCError({
       cause,
-      message: "Something went wrong.",
-      code: "INTERNAL_SERVER_ERROR",
-    });
+      message: 'Something went wrong.',
+      code: 'INTERNAL_SERVER_ERROR',
+    })
   }
 }

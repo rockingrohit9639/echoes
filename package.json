@@ -11,7 +11,8 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "format": "prettier --write './src/**/*.{ts,tsx,js}' *.{ts,tsx,js,cjs}"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.6.0",

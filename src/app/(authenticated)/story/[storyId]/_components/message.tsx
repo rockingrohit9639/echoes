@@ -1,101 +1,95 @@
-"use client";
+'use client'
 
-import { useMutation } from "@tanstack/react-query";
-import { CircleStopIcon, PauseCircleIcon, Volume2Icon } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import Markdown from "~/components/markdown";
-import { Button } from "~/components/ui/button";
-import { cn } from "~/lib/utils";
-import { type StoryMessageSchema } from "~/server/api/routers/story/story.input";
-import { type BasicProps } from "~/types/basic";
-import axios from "axios";
-import { useStore } from "~/store";
+import { useMutation } from '@tanstack/react-query'
+import { CircleStopIcon, PauseCircleIcon, Volume2Icon } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import Markdown from '~/components/markdown'
+import { Button } from '~/components/ui/button'
+import { cn } from '~/lib/utils'
+import { type StoryMessageSchema } from '~/server/api/routers/story/story.input'
+import { type BasicProps } from '~/types/basic'
+import axios from 'axios'
+import { useStore } from '~/store'
 
 type MessageProps = BasicProps & {
-  message: StoryMessageSchema;
-};
+  message: StoryMessageSchema
+}
 
 export default function Message({ className, style, message }: MessageProps) {
-  const [audio, setAudio] = useState<HTMLAudioElement>();
+  const [audio, setAudio] = useState<HTMLAudioElement>()
 
-  const isSpeaking = useStore((store) => store.isSpeaking);
-  const setIsSpeaking = useStore((store) => store.setIsSpeaking);
+  const isSpeaking = useStore((store) => store.isSpeaking)
+  const setIsSpeaking = useStore((store) => store.setIsSpeaking)
 
   const speechMutation = useMutation({
     mutationFn: async (text: string) => {
-      const response = await axios.post<Blob>(
-        "/api/tts",
-        { text },
-        { responseType: "blob" },
-      );
-      return response.data;
+      const response = await axios.post<Blob>('/api/tts', { text }, { responseType: 'blob' })
+      return response.data
     },
     onSuccess: async (data) => {
-      const audio = new Audio(URL.createObjectURL(data));
+      const audio = new Audio(URL.createObjectURL(data))
       audio.onended = () => {
-        setIsSpeaking(false);
-      };
+        setIsSpeaking(false)
+      }
 
       await audio.play().then(() => {
-        setIsSpeaking(true);
-      });
+        setIsSpeaking(true)
+      })
 
-      setAudio(audio);
+      setAudio(audio)
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      toast.error(error.message)
     },
-  });
+  })
 
   async function speak() {
     // If it is already speaking then pause it.
     if (isSpeaking) {
-      handlePause();
-      return;
+      handlePause()
+      return
     }
 
     // If it is not speaking but Audio is present and resume
     if (audio) {
-      await handleResume();
-      return;
+      await handleResume()
+      return
     }
 
-    speechMutation.mutate(message.data.content);
+    speechMutation.mutate(message.data.content)
   }
 
   async function handleResume() {
     if (audio) {
-      await audio.play();
-      setIsSpeaking(true);
+      await audio.play()
+      setIsSpeaking(true)
     }
   }
 
   function handlePause() {
     if (audio) {
-      audio.pause();
+      audio.pause()
     }
 
-    setIsSpeaking(false);
+    setIsSpeaking(false)
   }
 
   async function handleStop() {
     if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
+      audio.pause()
+      audio.currentTime = 0
     }
-    setIsSpeaking(false);
+    setIsSpeaking(false)
   }
 
   return (
-    <div className={cn("mb-4 flex flex-col gap-1", className)} style={style}>
-      <p className="mb-1 text-sm text-muted-foreground">
-        {message.type === "human" ? "You" : "Echo"}
-      </p>
+    <div className={cn('mb-4 flex flex-col gap-1', className)} style={style}>
+      <p className="mb-1 text-sm text-muted-foreground">{message.type === 'human' ? 'You' : 'Echo'}</p>
 
       <Markdown className="w-full">{message.data.content}</Markdown>
 
-      {message.type === "ai" ? (
+      {message.type === 'ai' ? (
         <div className="flex items-center gap-1">
           <Button
             icon={isSpeaking ? <PauseCircleIcon /> : <Volume2Icon />}
@@ -118,5 +112,5 @@ export default function Message({ className, style, message }: MessageProps) {
         </div>
       ) : null}
     </div>
-  );
+  )
 }

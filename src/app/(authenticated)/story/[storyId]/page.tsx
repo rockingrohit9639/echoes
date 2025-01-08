@@ -1,15 +1,15 @@
-import { api } from "~/trpc/server";
-import Story from "./_components/story";
-import { redirect } from "next/navigation";
+import { api } from '~/trpc/server'
+import Story from './_components/story'
+import { redirect } from 'next/navigation'
 
 type StoryDetailsProps = {
-  params: { storyId: string };
-};
+  params: { storyId: string }
+}
 
 export default async function StoryDetails({ params }: StoryDetailsProps) {
-  const story = await api.story.findById(params.storyId);
+  const story = await api.story.findById(params.storyId)
   if (story.isCompleted) {
-    return redirect(`/story/${params.storyId}/read`);
+    return redirect(`/story/${params.storyId}/read`)
   }
 
   return (
@@ -31,5 +31,5 @@ export default async function StoryDetails({ params }: StoryDetailsProps) {
         <p className="text-sm">{story.characterAppearance}</p>
       </div>
     </div>
-  );
+  )
 }
