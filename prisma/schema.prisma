@@ -67,6 +67,8 @@ model Story {
     characterAppearance String
     isCompleted         Boolean @default(false)
 
+    finalStory FinalStory? // this will be generated at the end of story by AI.
+
     createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
     createdById String @db.ObjectId
 
@@ -81,4 +83,29 @@ model StoryHistory {
     sessionId String @unique
 
     messages Json[] @default([])
+}
+
+model FinalStory {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    story    Story     @relation(fields: [storyId], references: [id])
+    storyId  String    @unique @db.ObjectId
+    chapters Chapter[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    chapterId String   @db.ObjectId
+}
+
+model Chapter {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    title   String
+    content String
+
+    finalStory   FinalStory @relation(fields: [finalStoryId], references: [id])
+    finalStoryId String     @db.ObjectId
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
