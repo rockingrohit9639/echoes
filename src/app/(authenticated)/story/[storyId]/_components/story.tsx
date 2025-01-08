@@ -12,9 +12,9 @@ import { newMessageInput, type StoryMessageSchema, type NewMessageInput } from '
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
-import { BookPlusIcon, SendIcon } from 'lucide-react'
+import { SendIcon } from 'lucide-react'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
+import PublishStoryButton from './publish-story-button'
 
 type StoryProps = BasicProps & {
   id: string
@@ -24,7 +24,6 @@ export default function Story({ className, style, id }: StoryProps) {
   const utils = api.useUtils()
   const containerEndRef = useRef<React.ElementRef<'div'>>(null)
   const messagesContainerRef = useRef<React.ElementRef<'div'>>(null)
-  const router = useRouter()
 
   const form = useForm<NewMessageInput>({
     resolver: zodResolver(newMessageInput),
@@ -48,14 +47,6 @@ export default function Story({ className, style, id }: StoryProps) {
         return [...prev, message]
       })
       setTimeout(scrollToBottom, 0)
-    },
-  })
-  const publishStoryMutation = api.story.publish.useMutation({
-    onError: (error) => {
-      toast.error(error.message)
-    },
-    onSuccess: () => {
-      router.replace(`/story/${id}/read`)
     },
   })
 
@@ -100,15 +91,7 @@ export default function Story({ className, style, id }: StoryProps) {
   return (
     <div className={cn('flex flex-col overflow-y-auto bg-dark', className)} style={style}>
       <div className="flex h-16 items-center justify-end border-b border-dashed px-6">
-        <Button
-          icon={<BookPlusIcon />}
-          loading={publishStoryMutation.isPending}
-          onClick={() => {
-            publishStoryMutation.mutate(id)
-          }}
-        >
-          Publish Story
-        </Button>
+        <PublishStoryButton storyId={id} />
       </div>
       <div
         ref={messagesContainerRef}
